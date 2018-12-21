@@ -3,14 +3,14 @@
 [![Coverage Status](https://coveralls.io/repos/github/kidunot89/chain-drive/badge.svg?branch=develop)](https://coveralls.io/github/kidunot89/chain-drive?branch=develop)
 
 ChainDrive is a **[React.js](https://reactjs.org)** component library dedicated to creating complex transitions without adding noise in your code. **[React Transition Group](https://github.com/reactjs/react-transition-group)**'s [`Transition`](https://reactcommunity.org/react-transition-group/transition) component is the core workhorse of this library, so it's a basic understanding of it is necessary there use.
--*inspiration* **[Anime.js + React Transition Group](https://itnext.io/anime-js-react-transition-group-5f6d0055a3a0)** by *[Uday Hiwarale](@thatisuday)*
+-*inspiration* **[Anime.js + React Transition Group](https://itnext.io/anime-js-react-transition-group-5f6d0055a3a0)** by *[Uday Hiwarale](https://github.com/thatisuday)*
 
 ## Features
 - **AnimeJs HOC**
 - **Timeout calculation** 
 
 ## Getting Started
-The library relies on two dependencies `react-transition-group` and `animejs`. To install the library in you project run `npm install react-transition animejs chain-drive` or `yarn add react-transition animejs chain-drive`. 
+To install the library in you project run `npm install chain-drive` or `yarn add chain-drive`. 
 
 ## Usage
 Using the library is quite simple.
