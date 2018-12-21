@@ -3,14 +3,14 @@
 [![Coverage Status](https://coveralls.io/repos/github/kidunot89/chain-drive/badge.svg?branch=develop)](https://coveralls.io/github/kidunot89/chain-drive?branch=develop)
 
 ChainDrive is a **[React.js](https://reactjs.org)** component library dedicated to creating complex transitions without adding noise in your code. **[React Transition Group](https://github.com/reactjs/react-transition-group)**'s [`Transition`](https://reactcommunity.org/react-transition-group/transition) component is the core workhorse of this library, so it's a basic understanding of it is necessary there use.
--*inspiration* **[Anime.js + React Transition Group](https://itnext.io/anime-js-react-transition-group-5f6d0055a3a0)** by *[Uday Hiwarale](@thatisuday)*
+-*inspiration* **[Anime.js + React Transition Group](https://itnext.io/anime-js-react-transition-group-5f6d0055a3a0)** by *[Uday Hiwarale](https://github.com/thatisuday)*
 
 ## Features
 - **AnimeJs HOC**
 - **Timeout calculation** 
 
 ## Getting Started
-The library relies on two dependencies `react-transition-group` and `animejs`. To install the library in you project run `npm install react-transition animejs chain-drive` or `yarn add react-transition animejs chain-drive`. 
+To install the library in you project run `npm install chain-drive` or `yarn add chain-drive`. 
 
 ## Usage
 Using the library is quite simple.
@@ -50,7 +50,7 @@ render( <App />, document.getByElementId( 'app' ) );
 ## Transition Components
 ### Chain
 #### Props
-**id** `string|number` *required* - Chained component unique identifier
+- **id** `string|number` *required* - Chained component unique identifier
 #### Notes & Examples
 Functions as a relay for the transition and a wrapper to **[React Transition Group](https://github.com/reactjs/react-transition-group)**'s [`Transition`]() component. It stores the `state` of Transition component and passes it to the `ChainContext` context using `React.js`' [Context API](https://reactjs.org/docs/context.html) for use by all child components. All props for the Transition component are passed through and work like normal, except `timeout`. The `timeout` prop defaults to the highest enter and exit timeouts of all mounted child `InnerChain` `animationHOC( component )`.
 
@@ -62,9 +62,9 @@ Functions as a relay for the transition and a wrapper to **[React Transition Gro
 
 ### InnerChain
 #### Props
-**id** `string|number` *required* - Chained component unique identifier
-**inOnEntering** `boolean` - toggle Transition `in` prop on `entering` or `exiting` states
-**reverse** `boolean` - `in` prop set to *true* on `exiting` states and *false* on `entering` states
+- **id** `string|number` *required* - Chained component unique identifier
+- **inOnEntering** `boolean` - toggle Transition `in` prop on `entering` or `exiting` states
+- **reverse** `boolean` - `in` prop set to *true* on `exiting` states and *false* on `entering` states
 #### Notes & Examples
 Functions as a middleman of sorts by retrieving the `state` of the closest parent `Chain` or `InnerChain` component through context and passing it down to its children.
 ```
@@ -78,11 +78,11 @@ Functions as a middleman of sorts by retrieving the `state` of the closest paren
 ## Animation HOCs
 ### withAnimeJs
 #### Props
-**id** `string|number` *required* - Chained component unique identifier
-**initial** `object|object[]` - AnimeJs initial state parameters
-**entering** `object|object[]` - AnimeJs entering parameters
-**exiting** `object|object[]` - AnimeJs exiting parameters
-**processTimeout** `function` - callback used to calculate parent Chain/InnerChain timeout
+- **id** `string|number` *required* - Chained component unique identifier
+- **initial** `object|object[]` - AnimeJs initial state parameters
+- **entering** `object|object[]` - AnimeJs entering parameters
+- **exiting** `object|object[]` - AnimeJs exiting parameters
+- **processTimeout** `function` - callback used to calculate parent Chain/InnerChain timeout
 #### Notes & Examples
 A HOC that wraps and executes a series of **[Anime.js](http://animejs.com)** calls on children. Anime.js manipulates DOM and doesn't interact with the VirtualDOM React uses meaning for it to properly target element the `ref` prop must be set on the wrapped component, like example below.
 ```
@@ -119,4 +119,4 @@ The resulting component will take a few additional props `entering`, `exiting`, 
 - More animated HOCs using other animation libraries
 
 ## Caveats
-`React.js` Context API is relied on heavily throughout this library so any version before `16.3` is incompatible. 
+- `React.js` Context API is relied on heavily throughout this library so any version before `16.3` is incompatible. 
