@@ -20,6 +20,9 @@
   },
   "main": "dist/index.js",
   "module": "dist/index.module.js",
+  "files": [
+    "dist"
+  ],
   "license": "MIT",
   "dependencies": {
     "animejs": "^2.2.0",
