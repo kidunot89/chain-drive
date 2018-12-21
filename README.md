@@ -92,7 +92,7 @@ const Container = withAnimeJs(
     )
 ) );
 ```
-The resulting component will take a few additional props `entering`, `exiting`, and `initial`, and `processTimeout`. The first three are parameters for Anime.js each applied at different states in the transition's cycle. Consult **Anime.js** [documentation](http://animejs.com/documentation/) for more info. `processTimeout` is callback used to calculate the `timeout` prop used for the parent `Chain` or `InnerChain` component. The default callback is pretty robust so you'll rarely ever have to set this.
+The resulting component will take some additional props `entering`, `exiting`, and `initial`, and `processTimeout`. The first three are parameters for Anime.js each applied at different states in the transition's cycle. Consult **Anime.js**' [documentation](http://animejs.com/documentation/) for more info. `processTimeout` is callback used to calculate the `timeout` prop used for the parent `Chain` or `InnerChain` component. The default callback is pretty robust so you'll rarely ever have to set this.
 ```
 <Chain id="app" in={ true }>
     <Container
