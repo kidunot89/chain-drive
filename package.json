@@ -1,0 +1,82 @@
+{
+  "name": "chain-drive",
+  "version": "0.0.1",
+  "description": "A React.js component library dedicated to creating complex transitions without adding noise in your code.",
+  "keywords": [
+    "reactjs",
+    "react-transition-group",
+    "animejs"
+  ],
+  "author": {
+    "name": "kidunot89",
+    "url": "https://axistaylor.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kidunot89/chain-drive.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kidunot89/chain-drive/issues"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.module.js",
+  "license": "MIT",
+  "dependencies": {
+    "animejs": "^2.2.0",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
+    "react-transition-group": "^2.5.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.2.0",
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-external-helpers": "^7.2.0",
+    "@babel/plugin-proposal-class-properties": "^7.2.1",
+    "@babel/preset-env": "^7.2.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^23.6.0",
+    "babel-preset-react-app": "^6.1.0",
+    "babel-register": "^6.26.0",
+    "classnames": "^2.2.6",
+    "coveralls": "^3.0.2",
+    "css-loader": "^2.0.1",
+    "jest": "^23.6.0",
+    "jest-dom": "^3.0.0",
+    "node-sass": "^4.11.0",
+    "postcss-scss": "^2.0.0",
+    "react-test-renderer": "^16.6.3",
+    "react-testing-library": "^5.4.0",
+    "rollup": "^0.67.4",
+    "rollup-plugin-babel": "^4.1.0",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-node-resolve": "^4.0.0",
+    "rollup-plugin-postcss": "^1.6.3",
+    "rollup-plugin-replace": "^2.1.0",
+    "rollup-plugin-serve": "^0.6.0",
+    "rollup-watch": "^4.3.1",
+    "style-loader": "^0.23.1",
+    "url-loader": "^1.1.2"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c -w",
+    "examples:build": "cd \"./examples\" && \"./node_modules/.bin/webpack\"",
+    "examples:watch": "cd \"./examples\" && \"./node_modules/.bin/webpack-dev-server\"",
+    "start": "(npm run watch & npm run examples:watch)",
+    "tester": "jest test --no-cache --watch",
+    "test": "jest test --no-cache",
+    "coveralls": "jest test --coverage --coverageReporters=text-lcov | coveralls"
+  },
+  "proxy": "http://wpgraphql.example:8000",
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
+  }
+}
