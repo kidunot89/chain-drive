@@ -10,7 +10,7 @@ ChainDrive is a **[React.js](https://reactjs.org)** component library dedicated 
 - **Timeout calculation** 
 
 ## Getting Started
-The library relies on two dependencies `react-transition-group` and `animejs`. To install the library in you project run `npm install react-transition animejs chain-drive` or `yarn add react-transition animejs chain-drive`. 
+To install the library in you project run `npm install chain-drive` or `yarn add chain-drive`. 
 
 ## Usage
 Using the library is quite simple.
