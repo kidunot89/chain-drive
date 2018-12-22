@@ -1,6 +1,6 @@
 {
   "name": "chain-drive",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A React.js component library dedicated to creating complex transitions without adding noise in your code.",
   "keywords": [
     "reactjs",
