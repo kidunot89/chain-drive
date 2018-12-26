@@ -9,9 +9,9 @@ import { reduce } from 'lodash';
  * Chain initial state
  */
 const chainInitialState = {
-    init ( id ) {
+    init ( id, state = 'unmounted' ) {
         this.id = id;
-        this.state = 'unmounted';
+        this.state = state;
         this.children = {};
 
         return this;
@@ -19,6 +19,10 @@ const chainInitialState = {
 
     add( childId, { enter, exit } ) {
         this.children[ childId ] = { enter, exit };
+    },
+
+    remove( childId ) {
+        delete this.children[ childId ];
     },
 
     exists( childId ) {
@@ -63,9 +67,20 @@ const ChainContext = React.createContext( chainInitialState );
  * 
  * @param { React.Component } BaseComponent 
  */
-const chainedConsumer = BaseComponent => props => (
+const chainedConsumer = BaseComponent => ( { id, state, ...rest } ) => (
     <ChainContext.Consumer>
-        { context => ( <BaseComponent { ...props } context={ context } state={ context.state } /> ) }
+        { context => (
+            <BaseComponent
+                context={ 
+                    !context.id ?
+                        context.init( id ):
+                        context
+                }
+                id={ id }
+                state={ state || context.state }
+                { ...rest }
+            />
+        ) }
     </ChainContext.Consumer>
 );
 
