@@ -10,61 +10,104 @@ import { cleanup, render, waitForElement, wait } from 'react-testing-library';
  */
 import { Chain, ChainContext, withAnimeJs } from '../src';
 
-describe( 'chained Higher-Order-Component', async () => {
+describe( 'withAnimeJs Higher-Order-Component', async () => {
     afterEach( cleanup );
 
-    it( 'runs the animation upon mounting TestChain component', async() => {
-        const TestChain = withAnimeJs( React.forwardRef( ( { animeRef, context: c, id, ...r }, ref ) => (
-            <h1 ref={ ref } { ...r} data-testid="test">
-                <ChainContext.Consumer>
-                    { context => (
-                        <React.Fragment>
-                            <p className="state">{ context.state }</p>
-                            <p className="enter-timeout">{ context.timeout().enter }</p>
-                            <p className="exit-timeout">{ context.timeout().exit }</p>
-                        </React.Fragment>
-                    ) }
-                </ChainContext.Consumer>
-            </h1>
-        ) ) );
+    it( 'runs animation based off "state" prop', async () => {
+        const Test = withAnimeJs(
+            React.forwardRef(
+                ( { animeRef, context: c, ...r }, ref ) => ( <p ref={ ref } { ...r } /> )
+            )
+        );
 
-        const { getByText, getByTestId, rerender, container } = render(
-            <Chain id="test-unit" in>
-                <TestChain
-                    id="test-h1"
-                    initial={ { opacity: 0 } }
+        const { getByText, rerender } = render(
+            <Test
+                id="test"
+                state="enter"
+                enter={ {
+                    opacity: 1,
+                    duration: 1000,
+                } }
+                exit={ {
+                    opacity: 0,
+                    duration: 1500,
+                } }
+            >
+                Hello World!!
+            </Test>
+        );
+
+        const element = getByText( /Hello World!!/ );
+        expect( element ).toBeTruthy();
+        await wait( () => expect( element.getAttribute( 'style' ) ).toEqual( 'opacity: 1;') );
+
+        rerender(
+            <Test
+                id="test"
+                state="exit"
+                enter={ {
+                    opacity: 1,
+                    duration: 1000,
+                } }
+                exit={ {
+                    opacity: 0,
+                    duration: 1500,
+                } }
+            >
+                Hello World!!
+            </Test>
+        );
+        await wait( () => expect( element.getAttribute( 'style' ) ).toEqual( 'opacity: 0;') );
+    } )
+
+    it( 'runs animations with "state" prop being managed by parent Chain component', async() => {
+        const Test = withAnimeJs(
+            React.forwardRef( 
+                ( { animeRef, context: c, ...r }, ref ) => ( <p ref={ ref } { ...r} /> )
+            )
+        );
+
+        const { getByText, rerender } = render(
+            <Chain id="test-unit" appear in>
+                <Test
+                    id="test"
                     entering={ {
                         opacity: 1,
-                        duration: 50,
+                        duration: 1000,
                     } }
                     exiting={ {
                         opacity: 0,
-                        duration: 100,
+                        duration: 1500,
                     } }
-                />
+                    exited={ { opacity: 0 } }
+                >
+                    Hello World!!
+                </Test>
             </Chain>
         );
-        await wait( () => expect( getByTestId( /test/ ).getAttribute( 'style' ) ).toEqual( 'opacity: 0;' ) );
-        await wait( () => expect( getByText( /entering|entered/ ) ).toBeTruthy() );
+        const element = getByText( /Hello World!!/ );
+        expect( element ).toBeTruthy();
+        await wait( () => expect( element.getAttribute( 'style' ) ).toEqual( 'opacity: 1;') );
 
         rerender( 
-            <Chain id="test-unit" in>
-                <TestChain
-                    id="test-h1"
-                    initial={ { opacity: 0 } }
+            <Chain id="test-unit" appear in={ false }>
+                <Test
+                    id="test"
                     entering={ {
                         opacity: 1,
-                        duration: 50,
+                        duration: 1000,
                     } }
                     exiting={ {
                         opacity: 0,
-                        duration: 100,
+                        duration: 1500,
                     } }
-                />
+                    exited={ { opacity: 0 } }
+                >
+                    Hello World!!
+                </Test>
             </Chain> 
         );
-        await wait( () => expect( getByText( /50/ ) ).toBeTruthy() );
-        await wait( () => expect( getByText( /100/ ) ).toBeTruthy() );
+        await wait( () => expect( element.getAttribute( 'style' ) ).toEqual( 'opacity: 0;') );
     } );
 
     it( `animates element targeted upon mounting TestChain component 
@@ -118,53 +161,42 @@ describe( 'chained Higher-Order-Component', async () => {
 
     it( 'animates multiple elements', async () => {
         const TestChain = withAnimeJs(
-            React.forwardRef( ( { animeRef, context, children, ...r }, ref ) => {
-                if ( context.state === 'entered' || context.state === 'exited' ) {
-                    return <p ref={ ref } { ...r }>{ children }</p>
-                }
-        
-                return (
+            React.forwardRef(
+                ( { animeRef, context, state, children, ...r }, ref ) => (
                     <p ref={ ref } { ...r }>
-                        { map( children, ( letter, i ) => {
-                            return /\S/g.test( letter ) ? 
-                                ( <span key={ `letter-${ i }` } className="letter">{ letter }</span> ):
-                                letter; 
-                        } ) }
-                    </p> 
-                );  
-            }
-        ) );
+                        { state === 'exited' ?
+                            children :
+                            map( children, ( char, i ) => {
+                                return /\S/g.test( char ) ? 
+                                    ( <span key={ `letter-${ i }` } className="letter">{ char }</span> ):
+                                    char; 
+                            } ) }
+                    </p>
+                )
+            )
+        );
     
         const { getByText, rerender } = render(
             <Chain id="test-unit" appear in>
                 <TestChain
                     id="test-phrase"
                     entering={ [
-                        {
-                            opacity: [ 0, 1 ],
-                            duration: 550,
-                        },
+                        { opacity: 1 },
                         {
                             targets: '.letter',
-                            opacity: [ 0, 1 ],
+                            opacity: 1,
                             duration: 1000,
                             elasticity: 600,
                             delay: ( _, i ) => 45 * ( i + 1 ),
                         }
                     ] }
-                    exiting={ [
-                        {
-                            opacity: [ 0 ],
-                            duration: 350,
-                            delay: 650,
-                        },
-                        {
-                            targets: '.letter',
-                            opacity: [ 1, 0 ],
-                            duration: 650,
-                            delay: ( _, i, len ) => 45 * ( len - i ),
-                        }
-                    ] }
+                    exiting={ {
+                        targets: '.letter',
+                        opacity: 0,
+                        duration: 650,
+                        delay: ( _, i, len ) => 45 * ( len - i ),
+                    } }
+                    exited={ { opacity: 0 } }
                 >Test</TestChain>
             </Chain>
         );
@@ -180,36 +212,27 @@ describe( 'chained Higher-Order-Component', async () => {
                 <TestChain
                     id="test-phrase"
                     entering={ [
-                        {
-                            opacity: [ 0, 1 ],
-                            duration: 550,
-                        },
+                        { opacity: 1 },
                         {
                             targets: '.letter',
-                            opacity: [ 0, 1 ],
+                            opacity: 1,
                             duration: 1000,
                             elasticity: 600,
                             delay: ( _, i ) => 45 * ( i + 1 ),
                         }
                     ] }
-                    exiting={ [
-                        {
-                            opacity: [ 0 ],
-                            duration: 350,
-                            delay: 650,
-                        },
-                        {
-                            targets: '.letter',
-                            opacity: [ 1, 0 ],
-                            duration: 650,
-                            delay: ( _, i, len ) => 45 * ( len - i ),
-                        }
-                    ] }
+                    exiting={ {
+                        targets: '.letter',
+                        opacity: 0,
+                        duration: 650,
+                        delay: ( _, i, len ) => 45 * ( len - i ),
+                    } }
+                    exited={ { opacity: 0 } }
                 >Test</TestChain>
             </Chain>
         );
     
         await wait( () => expect( getByText( /Test/ ) ).toBeTruthy() );
-        expect( getByText( /Test/ ).getAttribute( 'style' ) ).toEqual( 'opacity: 0;' );
+        await wait( () => expect( getByText( /Test/ ).getAttribute( 'style' ) ).toEqual( 'opacity: 0;' ) );
     } );
 } );

@@ -1,6 +1,6 @@
 {
   "name": "chain-drive",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "description": "A React.js component library dedicated to creating complex transitions without adding noise in your code.",
   "keywords": [
     "reactjs",
@@ -20,6 +20,9 @@
   },
   "main": "dist/index.js",
   "module": "dist/index.module.js",
+  "files": [
+    "dist"
+  ],
   "license": "MIT",
   "dependencies": {
     "animejs": "^2.2.0",

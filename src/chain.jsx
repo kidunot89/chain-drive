@@ -69,6 +69,10 @@ const InnerChain = ( { inOnEntering, reverse, ...r } ) => (
 );
 
 InnerChain.propTypes = {
+    id: PropTypes.oneOfType( [
+        PropTypes.string,
+        PropTypes.number,
+    ] ).isRequired,
     inOnEntering: PropTypes.bool,
     reverse: PropTypes.bool,
 };
