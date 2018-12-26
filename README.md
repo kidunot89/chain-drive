@@ -113,7 +113,8 @@ The resulting component can animated by state. This is done by provided anime.js
     </Container>
 ```
 When no `state` prop is provided, it's set to that of the nearest parent `ChainContext`. If none is found, it uses the default which is `unmounted`. Using in conjournment with the **Chain** and **InnerChain** components can allow for centralized state-management and complex transitions without much effort. 
-In the sandbox below is a recreation of couple of [Tobias Ahlin](http://tobiasahlin.com)'s [Moving Letters] examples. [Styled Components](https://www.styled-components.com/) are used for the base styling, but this can easily be replace with plain css.
+In the sandbox below is a recreation of couple of [Tobias Ahlin](http://tobiasahlin.com)'s [Moving Letters](http://tobiasahlin.com/moving-letters/#) examples. [Styled Components](https://www.styled-components.com/) are used for the base styling, but this can easily be replace with plain css.
+
 [![Edit ChainDrive Example-1](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/00rv90712v)
 
 ## Coming Soon
