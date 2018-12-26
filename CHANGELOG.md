@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.0.4]
+### Removed
+- **Unnecessary debug code** removed from context.js and chain.js.
+
 ## [0.0.3]
 ### Changes
 - **withAnimeJs** wrapped component can be used stand-alone without a parent `Chain` component.

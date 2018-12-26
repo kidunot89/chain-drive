@@ -109,11 +109,9 @@ var chainInitialState = {
     }
   },
   timeout: function timeout() {
-    console.log(this.children);
     return reduce(this.children, function (result, _ref2) {
       var enter = _ref2.enter,
           exit = _ref2.exit;
-      console.log(enter, exit);
 
       if (enter > result.enter) {
         result.enter = enter;
@@ -150,7 +148,7 @@ var chainedConsumer = function chainedConsumer(BaseComponent) {
     return React.createElement(ChainContext.Consumer, {
       __source: {
         fileName: _jsxFileName,
-        lineNumber: 73
+        lineNumber: 71
       },
       __self: this
     }, function (context) {
@@ -161,7 +159,7 @@ var chainedConsumer = function chainedConsumer(BaseComponent) {
       }, rest, {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 75
+          lineNumber: 73
         },
         __self: this
       }));
@@ -1037,14 +1035,12 @@ function (_React$Component) {
           children = _this$props.children,
           rest = _objectWithoutProperties(_this$props, ["id", "children"]);
 
-      console.log(this.state.children);
-      console.log(this.state.timeout());
       return React.createElement(Transition, Object.assign({
         timeout: this.state.timeout()
       }, rest, {
         __source: {
           fileName: _jsxFileName$1,
-          lineNumber: 33
+          lineNumber: 31
         },
         __self: this
       }), function (state) {
@@ -1054,7 +1050,7 @@ function (_React$Component) {
           }),
           __source: {
             fileName: _jsxFileName$1,
-            lineNumber: 38
+            lineNumber: 36
           },
           __self: this
         }, children);
@@ -1086,7 +1082,7 @@ var InnerChain = function InnerChain(_ref) {
   return React.createElement(ChainContext.Consumer, {
     __source: {
       fileName: _jsxFileName$1,
-      lineNumber: 55
+      lineNumber: 53
     },
     __self: this
   }, function (_ref2) {
@@ -1103,7 +1099,7 @@ var InnerChain = function InnerChain(_ref) {
       in: show,
       __source: {
         fileName: _jsxFileName$1,
-        lineNumber: 67
+        lineNumber: 65
       },
       __self: this
     }));

@@ -39,11 +39,9 @@ const chainInitialState = {
     },
 
     timeout() {
-        console.log( this.children );
         return reduce(
             this.children,
             ( result, { enter, exit } ) => {
-                console.log( enter , exit );
                 if ( enter > result.enter ) {
                     result.enter = enter;
                 }

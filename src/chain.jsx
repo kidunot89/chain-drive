@@ -27,8 +27,6 @@ class Chain extends React.Component {
 
     render() {
         const { id, children, ...rest } = this.props;
-        console.log( this.state.children );
-        console.log( this.state.timeout() );
         return (
             <Transition
                 timeout={ this.state.timeout() }
