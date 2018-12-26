@@ -27,6 +27,8 @@ class Chain extends React.Component {
 
     render() {
         const { id, children, ...rest } = this.props;
+        console.log( this.state.children );
+        console.log( this.state.timeout() );
         return (
             <Transition
                 timeout={ this.state.timeout() }
@@ -69,6 +71,10 @@ const InnerChain = ( { inOnEntering, reverse, ...r } ) => (
 );
 
 InnerChain.propTypes = {
+    id: PropTypes.oneOfType( [
+        PropTypes.string,
+        PropTypes.number,
+    ] ).isRequired,
     inOnEntering: PropTypes.bool,
     reverse: PropTypes.bool,
 };

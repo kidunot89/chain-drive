@@ -105,9 +105,9 @@ const processTimeout = ( rootEl, params ) => {
         if ( Array.isArray( params ) ) {
             return reduce(
                 params,
-                ( highestTimeout, nextParams ) => {
+                ( total, nextParams ) => {
                     const nextTimeout = calculate( rootEl, nextParams );
-                    return highestTimeout < nextTimeout ? nextTimeout : highestTimeout;
+                    return total + nextTimeout;
                 },                    
                 0
             );
@@ -133,6 +133,7 @@ export default BaseComponent => {
             this.ref = React.createRef();
             this.animeRef = null;
             this.linkToChain = this.linkToChain.bind( this );
+            this.unlinkToChain = this.unlinkToChain.bind( this );
             this.timeout = this.timeout.bind( this );
             this.animate = this.animate.bind( this );
             this.animateTimeline = this.animateTimeline.bind( this );
@@ -140,24 +141,29 @@ export default BaseComponent => {
 
         componentDidMount() {
             this.linkToChain();
-            this.animate( 'initial' );
+        }
+
+        componentWillUnmount() {
+            this.unlinkToChain();
         }
 
         componentDidUpdate( prevProps ) {
             const { state } = this.props;
 
             if ( prevProps.state !== state ) {
-                if ( state === 'entering' || state === 'exiting' ) {
-                    this.animate( state );
-                }
+                this.animate( state );
             }
         }
 
         linkToChain() {
+            const { id, state } = this.props;
+            this.props.context.add( id, this.timeout() );
+            this.animate( state );
+        }
+
+        unlinkToChain() {
             const { id } = this.props;
-            if ( !this.props.context.exists( id ) ) {
-                this.props.context.add( id, this.timeout() );
-            }
+            this.props.context.remove( id );
         }
 
         timeout() {
@@ -184,14 +190,20 @@ export default BaseComponent => {
             }
         }
 
-        animateTimeline( status ) {
+        animateTimeline( state ) {
             this.animeRef = anime.timeline( { loop: false } );
             const rootEl = this.ref.current;
-            each( this.props[ status ], params => this.animeRef.add( formatParams( params, rootEl ) ) );
+            each( this.props[ state ], params => this.animeRef.add( formatParams( params, rootEl ) ) );
         }
 
         render() {
-            const props = omit( this.props, [ 'initial', 'entering', 'exiting', 'processTimeout' ] );
+            const props = omit( this.props, [
+                'entering',
+                'entered',
+                'exiting',
+                'exited',
+                'processTimeout',
+            ] );
             
             return (<BaseComponent ref={ this.ref } animeRef={ this.animeRef } { ...props } />);
         }
@@ -207,18 +219,6 @@ export default BaseComponent => {
             updateTimeout: PropTypes.func,
         } ).isRequired,
         state: PropTypes.string.isRequired,
-        initial: PropTypes.oneOfType( [
-            PropTypes.shape( {} ),
-            PropTypes.arrayOf( PropTypes.shape( {} ) ),
-        ] ),
-        entering: PropTypes.oneOfType( [
-            PropTypes.shape( {} ),
-            PropTypes.arrayOf( PropTypes.shape( {} ) ),
-        ] ),
-        exiting: PropTypes.oneOfType( [
-            PropTypes.shape( {} ),
-            PropTypes.arrayOf( PropTypes.shape( {} ) ),
-        ] ),
         processTimeout: PropTypes.func,
     };
 

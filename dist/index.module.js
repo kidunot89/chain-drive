@@ -3,6 +3,40 @@ import React from 'react';
 import { reduce, omit, each } from 'lodash';
 import anime from 'animejs';
 
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
+function _objectWithoutProperties(source, excluded) {
+  if (source == null) return {};
+  var target = _objectWithoutPropertiesLoose(source, excluded);
+  var key, i;
+
+  if (Object.getOwnPropertySymbols) {
+    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+
+    for (i = 0; i < sourceSymbolKeys.length; i++) {
+      key = sourceSymbolKeys[i];
+      if (excluded.indexOf(key) >= 0) continue;
+      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+      target[key] = source[key];
+    }
+  }
+
+  return target;
+}
+
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -44,8 +78,9 @@ var _jsxFileName = "/home/geoff/Dev/web/chain-drive/src/context.js";
 
 var chainInitialState = {
   init: function init(id) {
+    var state = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'unmounted';
     this.id = id;
-    this.state = 'unmounted';
+    this.state = state;
     this.children = {};
     return this;
   },
@@ -56,6 +91,9 @@ var chainInitialState = {
       enter: enter,
       exit: exit
     };
+  },
+  remove: function remove(childId) {
+    delete this.children[childId];
   },
   exists: function exists(childId) {
     return !!this.children[childId];
@@ -71,9 +109,11 @@ var chainInitialState = {
     }
   },
   timeout: function timeout() {
+    console.log(this.children);
     return reduce(this.children, function (result, _ref2) {
       var enter = _ref2.enter,
           exit = _ref2.exit;
+      console.log(enter, exit);
 
       if (enter > result.enter) {
         result.enter = enter;
@@ -102,60 +142,32 @@ var ChainContext = React.createContext(chainInitialState);
  */
 
 var chainedConsumer = function chainedConsumer(BaseComponent) {
-  return function (props) {
+  return function (_ref3) {
+    var id = _ref3.id,
+        state = _ref3.state,
+        rest = _objectWithoutProperties(_ref3, ["id", "state"]);
+
     return React.createElement(ChainContext.Consumer, {
       __source: {
         fileName: _jsxFileName,
-        lineNumber: 67
+        lineNumber: 73
       },
       __self: this
     }, function (context) {
-      return React.createElement(BaseComponent, Object.assign({}, props, {
-        context: context,
-        state: context.state,
+      return React.createElement(BaseComponent, Object.assign({
+        context: !context.id ? context.init(id) : context,
+        id: id,
+        state: state || context.state
+      }, rest, {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 68
+          lineNumber: 75
         },
         __self: this
       }));
     });
   };
 };
-
-function _objectWithoutPropertiesLoose(source, excluded) {
-  if (source == null) return {};
-  var target = {};
-  var sourceKeys = Object.keys(source);
-  var key, i;
-
-  for (i = 0; i < sourceKeys.length; i++) {
-    key = sourceKeys[i];
-    if (excluded.indexOf(key) >= 0) continue;
-    target[key] = source[key];
-  }
-
-  return target;
-}
-
-function _objectWithoutProperties(source, excluded) {
-  if (source == null) return {};
-  var target = _objectWithoutPropertiesLoose(source, excluded);
-  var key, i;
-
-  if (Object.getOwnPropertySymbols) {
-    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
-
-    for (i = 0; i < sourceSymbolKeys.length; i++) {
-      key = sourceSymbolKeys[i];
-      if (excluded.indexOf(key) >= 0) continue;
-      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
-      target[key] = source[key];
-    }
-  }
-
-  return target;
-}
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -1025,12 +1037,14 @@ function (_React$Component) {
           children = _this$props.children,
           rest = _objectWithoutProperties(_this$props, ["id", "children"]);
 
+      console.log(this.state.children);
+      console.log(this.state.timeout());
       return React.createElement(Transition, Object.assign({
         timeout: this.state.timeout()
       }, rest, {
         __source: {
           fileName: _jsxFileName$1,
-          lineNumber: 31
+          lineNumber: 33
         },
         __self: this
       }), function (state) {
@@ -1040,7 +1054,7 @@ function (_React$Component) {
           }),
           __source: {
             fileName: _jsxFileName$1,
-            lineNumber: 36
+            lineNumber: 38
           },
           __self: this
         }, children);
@@ -1072,7 +1086,7 @@ var InnerChain = function InnerChain(_ref) {
   return React.createElement(ChainContext.Consumer, {
     __source: {
       fileName: _jsxFileName$1,
-      lineNumber: 53
+      lineNumber: 55
     },
     __self: this
   }, function (_ref2) {
@@ -1089,7 +1103,7 @@ var InnerChain = function InnerChain(_ref) {
       in: show,
       __source: {
         fileName: _jsxFileName$1,
-        lineNumber: 65
+        lineNumber: 67
       },
       __self: this
     }));
@@ -1097,6 +1111,7 @@ var InnerChain = function InnerChain(_ref) {
 };
 
 InnerChain.propTypes = {
+  id: propTypes.oneOfType([propTypes.string, propTypes.number]).isRequired,
   inOnEntering: propTypes.bool,
   reverse: propTypes.bool
 };
@@ -1211,9 +1226,9 @@ var calculate = function calculate(rootEl, params) {
 var processTimeout = function processTimeout(rootEl, params) {
   if (params) {
     if (Array.isArray(params)) {
-      return reduce(params, function (highestTimeout, nextParams) {
+      return reduce(params, function (total, nextParams) {
         var nextTimeout = calculate(rootEl, nextParams);
-        return highestTimeout < nextTimeout ? nextTimeout : highestTimeout;
+        return total + nextTimeout;
       }, 0);
     } else {
       return calculate(rootEl, params);
@@ -1246,6 +1261,7 @@ var withAnime = (function (BaseComponent) {
       _this.ref = React.createRef();
       _this.animeRef = null;
       _this.linkToChain = _this.linkToChain.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+      _this.unlinkToChain = _this.unlinkToChain.bind(_assertThisInitialized(_assertThisInitialized(_this)));
       _this.timeout = _this.timeout.bind(_assertThisInitialized(_assertThisInitialized(_this)));
       _this.animate = _this.animate.bind(_assertThisInitialized(_assertThisInitialized(_this)));
       _this.animateTimeline = _this.animateTimeline.bind(_assertThisInitialized(_assertThisInitialized(_this)));
@@ -1256,7 +1272,11 @@ var withAnime = (function (BaseComponent) {
       key: "componentDidMount",
       value: function componentDidMount() {
         this.linkToChain();
-        this.animate('initial');
+      }
+    }, {
+      key: "componentWillUnmount",
+      value: function componentWillUnmount() {
+        this.unlinkToChain();
       }
     }, {
       key: "componentDidUpdate",
@@ -1264,27 +1284,31 @@ var withAnime = (function (BaseComponent) {
         var state = this.props.state;
 
         if (prevProps.state !== state) {
-          if (state === 'entering' || state === 'exiting') {
-            this.animate(state);
-          }
+          this.animate(state);
         }
       }
     }, {
       key: "linkToChain",
       value: function linkToChain() {
+        var _this$props = this.props,
+            id = _this$props.id,
+            state = _this$props.state;
+        this.props.context.add(id, this.timeout());
+        this.animate(state);
+      }
+    }, {
+      key: "unlinkToChain",
+      value: function unlinkToChain() {
         var id = this.props.id;
-
-        if (!this.props.context.exists(id)) {
-          this.props.context.add(id, this.timeout());
-        }
+        this.props.context.remove(id);
       }
     }, {
       key: "timeout",
       value: function timeout() {
-        var _this$props = this.props,
-            entering = _this$props.entering,
-            exiting = _this$props.exiting,
-            processTimeout = _this$props.processTimeout;
+        var _this$props2 = this.props,
+            entering = _this$props2.entering,
+            exiting = _this$props2.exiting,
+            processTimeout = _this$props2.processTimeout;
         var rootEl = this.ref.current;
         return {
           enter: processTimeout(rootEl, entering),
@@ -1308,28 +1332,28 @@ var withAnime = (function (BaseComponent) {
       }
     }, {
       key: "animateTimeline",
-      value: function animateTimeline(status) {
+      value: function animateTimeline(state) {
         var _this2 = this;
 
         this.animeRef = anime.timeline({
           loop: false
         });
         var rootEl = this.ref.current;
-        each(this.props[status], function (params) {
+        each(this.props[state], function (params) {
           return _this2.animeRef.add(formatParams(params, rootEl));
         });
       }
     }, {
       key: "render",
       value: function render() {
-        var props = omit(this.props, ['initial', 'entering', 'exiting', 'processTimeout']);
+        var props = omit(this.props, ['entering', 'entered', 'exiting', 'exited', 'processTimeout']);
         return React.createElement(BaseComponent, Object.assign({
           ref: this.ref,
           animeRef: this.animeRef
         }, props, {
           __source: {
             fileName: _jsxFileName$2,
-            lineNumber: 196
+            lineNumber: 208
           },
           __self: this
         }));
@@ -1346,9 +1370,6 @@ var withAnime = (function (BaseComponent) {
       updateTimeout: propTypes.func
     }).isRequired,
     state: propTypes.string.isRequired,
-    initial: propTypes.oneOfType([propTypes.shape({}), propTypes.arrayOf(propTypes.shape({}))]),
-    entering: propTypes.oneOfType([propTypes.shape({}), propTypes.arrayOf(propTypes.shape({}))]),
-    exiting: propTypes.oneOfType([propTypes.shape({}), propTypes.arrayOf(propTypes.shape({}))]),
     processTimeout: propTypes.func
   };
   AnimeJs.defaultProps = {

@@ -29,7 +29,6 @@ const App = () => (
     <Chain id="app" in={ true }>
         <Container
             id="section"
-            initial={ { opacity: 0 } }
             entering={ {
                 opacity: 1,
                 translateX: [ '-100%', 0 ],
@@ -40,6 +39,7 @@ const App = () => (
                 translateX: [ 0, '+100%' ],
                 duration: 450,
             } }
+            exited={ { opacity: 0 } }
         >
     </Chain>
 )
@@ -78,39 +78,43 @@ Functions as a middleman of sorts by retrieving the `state` of the closest paren
 ## Animation HOCs
 ### withAnimeJs
 #### Props
-- **id** `string|number` *required* - Chained component unique identifier
-- **initial** `object|object[]` - AnimeJs initial state parameters
-- **entering** `object|object[]` - AnimeJs entering parameters
-- **exiting** `object|object[]` - AnimeJs exiting parameters
+- **id** `string|number` *required* - component unique identifier
+- **state** `string` - component's current state
 - **processTimeout** `function` - callback used to calculate parent Chain/InnerChain timeout
 #### Notes & Examples
-A HOC that wraps and executes a series of **[Anime.js](http://animejs.com)** calls on children. Anime.js manipulates DOM and doesn't interact with the VirtualDOM React uses meaning for it to properly target element the `ref` prop must be set on the wrapped component, like example below.
+A HOC that wraps and executes a series of **[Anime.js](http://animejs.com)** calls on its children. Anime.js manipulates DOM and doesn't interact with the VirtualDOM React uses, meaning for it to properly target elements the `ref` prop must be set somewhere on the wrapped component, like example below.
 ```
 const Container = withAnimeJs( 
-    React.forwardRef( ( { animeRef, context, ...r }, ref ) => (
-        <div ref={ ref } { ...r }></div>
+    React.forwardRef( ( { animeRef, context, children, ...r }, ref ) => (
+        <div ref={ ref } { ...r }>
+            <span>Wrapped</span>
+            { children }
+        </div>
     )
 ) );
 ```
-The resulting component will take some additional props `entering`, `exiting`, and `initial`, and `processTimeout`. The first three are parameters for Anime.js each applied at different states in the transition's cycle. Consult **Anime.js**' [documentation](http://animejs.com/documentation/) for more info. `processTimeout` is callback used to calculate the `timeout` prop used for the parent `Chain` or `InnerChain` component. The default callback is pretty robust so you'll rarely ever have to set this.
+The resulting component can animated by state. This is done by provided anime.js parameters as a prop for the corresponding state. You can see an example of this in the following example. Consult **Anime.js**' [documentation](http://animejs.com/documentation/) for more info. `processTimeout` is a callback used to calculate the `timeout` prop used for a parenting `Chain` or `InnerChain` component. The default callback is pretty robust and isn't used during stand-alone use so you'll rarely ever have to set this.
 ```
-<Chain id="app" in={ true }>
     <Container
         id="section"
-        initial={ { opacity: 0 } } // No duration
-        entering={ {
+        state="hello"
+        hello={ {
             opacity: 1,
             translateX: [ '-100%', 0 ],
             duration: 600,
         } }
-        exiting={ {
+        goodbye={ {
             opacity: 0,
             translateX: [ 0, '+100%' ],
             duration: 450,
         } }
     >
-</Chain>
+        ...
+    </Container>
 ```
+When no `state` prop is provided, it's set to that of the nearest parent `ChainContext`. If none is found, it uses the default which is `unmounted`. Using in conjournment with the **Chain** and **InnerChain** components can allow for centralized state-management and complex transitions without much effort. 
+In the sandbox below is a recreation of couple of [Tobias Ahlin](http://tobiasahlin.com)'s [Moving Letters] examples. [Styled Components](https://www.styled-components.com/) are used for the base styling, but this can easily be replace with plain css.
+[![Edit ChainDrive Example-1](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/00rv90712v)
 
 ## Coming Soon
 - Demo
