@@ -50,9 +50,9 @@ render( <App />, document.getByElementId( 'app' ) );
 ## Transition Components
 ### Chain
 #### Props
-- **id** `string|number` *required* - Chained component unique identifier
+- **id** `string|number` *required* - ChainContext unique identifier
 #### Notes & Examples
-Functions as a relay for the transition and a wrapper to **[React Transition Group](https://github.com/reactjs/react-transition-group)**'s [`Transition`]() component. It stores the `state` of Transition component and passes it to the `ChainContext` context using `React.js`' [Context API](https://reactjs.org/docs/context.html) for use by all child components. All props for the Transition component are passed through and work like normal, except `timeout`. The `timeout` prop defaults to the highest enter and exit timeouts of all mounted child `InnerChain` `animationHOC( component )`.
+Functions as a relay for the transition and a wrapper to **[React Transition Group](https://github.com/reactjs/react-transition-group)**'s [`Transition`]() component. It stores the `state` of Transition component and passes it to the `ChainContext` context using `React.js`' [Context API](https://reactjs.org/docs/context.html) for use by all child components. All props for the Transition component are passed through and work like normal, except `timeout`. The `timeout` prop defaults to the highest enter and exit timeouts of all mounted direct child **withAnimeJs( component )**s.
 
 ```
 <Chain id="app" in={ true }>
@@ -62,11 +62,11 @@ Functions as a relay for the transition and a wrapper to **[React Transition Gro
 
 ### InnerChain
 #### Props
-- **id** `string|number` *required* - Chained component unique identifier
+- **id** `string|number` *required* - ChainContext unique identifier
 - **inOnEntering** `boolean` - toggle Transition `in` prop on `entering` or `exiting` states
 - **reverse** `boolean` - `in` prop set to *true* on `exiting` states and *false* on `entering` states
 #### Notes & Examples
-Functions as a middleman of sorts by retrieving the `state` of the closest parent `Chain` or `InnerChain` component through context and passing it down to its children.
+Functions as a middleman of sorts by retrieving the `state` of the closest parent **Chain** or **InnerChain** component through context and passing it down to its children.
 ```
 <Chain id="app" in={ true }>
     <InnerChain>
@@ -78,7 +78,7 @@ Functions as a middleman of sorts by retrieving the `state` of the closest paren
 ## Animation HOCs
 ### withAnimeJs
 #### Props
-- **id** `string|number` *required* - component unique identifier
+- **id** `string|number` *required* - ChainContext unique identifier
 - **state** `string` - component's current state
 - **processTimeout** `function` - callback used to calculate parent Chain/InnerChain timeout
 #### Notes & Examples
@@ -93,7 +93,7 @@ const Container = withAnimeJs(
     )
 ) );
 ```
-The resulting component can animated by state. This is done by provided anime.js parameters as a prop for the corresponding state. You can see an example of this in the following example. Consult **Anime.js**' [documentation](http://animejs.com/documentation/) for more info. `processTimeout` is a callback used to calculate the `timeout` prop used for a parenting `Chain` or `InnerChain` component. The default callback is pretty robust and isn't used during stand-alone use so you'll rarely ever have to set this.
+The resulting component can be animated by state. This is done by providing anime.js parameters as a prop named after the corresponding state. You can see an example of this in the following example. Consult **Anime.js**' [documentation](http://animejs.com/documentation/) for more info. `processTimeout` is a callback used to calculate the `timeout` prop used for a parenting **Chain** or **InnerChain** component. The default callback is pretty robust and isn't used during stand-alone use so you'll rarely ever have to set this.
 ```
     <Container
         id="section"
@@ -118,7 +118,7 @@ In the sandbox below is a recreation of couple of [Tobias Ahlin](http://tobiasah
 [![Edit ChainDrive Example-1](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/00rv90712v)
 
 ## Coming Soon
-- Demo
+- More Examples
 
 ## Potential Ideas
 - More animated HOCs using other animation libraries
