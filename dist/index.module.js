@@ -1012,8 +1012,8 @@ var _jsxFileName$1 = "/home/geoff/Dev/web/chain-drive/src/chain.jsx";
 
 var Chain =
 /*#__PURE__*/
-function (_React$Component) {
-  _inherits(Chain, _React$Component);
+function (_React$PureComponent) {
+  _inherits(Chain, _React$PureComponent);
 
   function Chain() {
     var _this;
@@ -1068,13 +1068,12 @@ function (_React$Component) {
   }]);
 
   return Chain;
-}(React.Component);
+}(React.PureComponent);
 
 Chain.propTypes = {
   id: propTypes.oneOfType([propTypes.string, propTypes.number]).isRequired
 };
-
-var InnerChain = function InnerChain(_ref) {
+var InnerChain = React.memo(function (_ref) {
   var inOnEntering = _ref.inOnEntering,
       reverse = _ref.reverse,
       r = _objectWithoutProperties(_ref, ["inOnEntering", "reverse"]);
@@ -1104,8 +1103,7 @@ var InnerChain = function InnerChain(_ref) {
       __self: this
     }));
   });
-};
-
+});
 InnerChain.propTypes = {
   id: propTypes.oneOfType([propTypes.string, propTypes.number]).isRequired,
   inOnEntering: propTypes.bool,

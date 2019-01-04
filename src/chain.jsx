@@ -11,7 +11,7 @@ import { Transition } from 'react-transition-group';
  */
 import { chainInitialState, ChainContext } from './context';
 
-class Chain extends React.Component {
+class Chain extends React.PureComponent {
     constructor() {
         super( ...arguments );
         this.state = chainInitialState
@@ -49,7 +49,7 @@ Chain.propTypes = {
     ] ).isRequired,
 };
 
-const InnerChain = ( { inOnEntering, reverse, ...r } ) => (
+const InnerChain = React.memo( ( { inOnEntering, reverse, ...r } ) => (
     <ChainContext.Consumer>
         { ( { state } ) => {
             let show;
@@ -66,7 +66,7 @@ const InnerChain = ( { inOnEntering, reverse, ...r } ) => (
             )
         } }
     </ChainContext.Consumer>
-);
+) );
 
 InnerChain.propTypes = {
     id: PropTypes.oneOfType( [

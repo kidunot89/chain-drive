@@ -1,4 +1,11 @@
 # Changelog
+## [0.0.5]
+### Added
+- **prepublish** script added
+
+### Changes
+- **Chain and InnerChain** extend `PureComponent` and `memo`
+- **react and react-dom** removed from dependencies and moved to devDependencies and peerDependencies
 
 ## [0.0.4]
 ### Removed

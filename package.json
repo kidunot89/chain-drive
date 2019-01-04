@@ -26,8 +26,6 @@
   "license": "MIT",
   "dependencies": {
     "animejs": "^2.2.0",
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3",
     "react-transition-group": "^2.5.1"
   },
   "devDependencies": {
@@ -47,6 +45,8 @@
     "jest-dom": "^3.0.0",
     "node-sass": "^4.11.0",
     "postcss-scss": "^2.0.0",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
     "react-test-renderer": "^16.6.3",
     "react-testing-library": "^5.4.0",
     "rollup": "^0.67.4",
@@ -61,7 +61,12 @@
     "style-loader": "^0.23.1",
     "url-loader": "^1.1.2"
   },
+  "peerDependencies": {
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3"
+  },
   "scripts": {
+    "prepublish": "rm -rf ./dist && npm run build",
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "examples:build": "cd \"./examples\" && \"./node_modules/.bin/webpack\"",
