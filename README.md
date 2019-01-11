@@ -113,17 +113,19 @@ The resulting component can be animated by state. This is done by providing anim
     </Container>
 ```
 When no `state` prop is provided, it's set to that of the nearest parent `ChainContext`. If none is found, it uses the default which is `unmounted`. Using in conjournment with the **Chain** and **InnerChain** components can allow for centralized state-management and complex transitions without much effort. 
-In the sandbox below is a recreation of couple of [Tobias Ahlin](http://tobiasahlin.com)'s [Moving Letters](http://tobiasahlin.com/moving-letters/#) examples. [Styled Components](https://www.styled-components.com/) are used for the base styling, but this can easily be replace with plain css.
 
 ## Examples
 
 ### Flashy Text
+A recreation of couple of [Tobias Ahlin](http://tobiasahlin.com)'s [Moving Letters](http://tobiasahlin.com/moving-letters/#) examples. [Styled Components](https://www.styled-components.com/) are used for the base styling, but this can easily be replace with plain css.
 [![Edit ChainDrive Example-1](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/00rv90712v)
 
 ### Order Test
+A simple test to demonstrate the use of the `order` on the Chain Component.
 [![Edit Order Test](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/k14roo7q9r)
 
 ### Overlay Menu
+A simple overlay menu created using from both the previous Examples.
 [![Edit Overlay Menu](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/l25z6k2vlz)
 
 ## Coming Soon
