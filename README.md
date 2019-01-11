@@ -51,7 +51,8 @@ render( <App />, document.getByElementId( 'app' ) );
 ### Chain
 #### Props
 - **id** `string|number` *required* - ChainContext unique identifier
-#### Notes & Examples
+- **order** `string` - Chain transition order used for **Chain** and immediate child **InnerChain** component. Valid options are `fifo` *first-in first-out*, `filo` *first-in last-out*, `lifo` *last-in first-out*, and `lilo` *last-in last-out*. Defaults to `fifo`.
+#### Notes
 Functions as a relay for the transition and a wrapper to **[React Transition Group](https://github.com/reactjs/react-transition-group)**'s [`Transition`]() component. It stores the `state` of Transition component and passes it to the `ChainContext` context using `React.js`' [Context API](https://reactjs.org/docs/context.html) for use by all child components. All props for the Transition component are passed through and work like normal, except `timeout`. The `timeout` prop defaults to the highest enter and exit timeouts of all mounted direct child **withAnimeJs( component )**s.
 
 ```
@@ -63,9 +64,8 @@ Functions as a relay for the transition and a wrapper to **[React Transition Gro
 ### InnerChain
 #### Props
 - **id** `string|number` *required* - ChainContext unique identifier
-- **inOnEntering** `boolean` - toggle Transition `in` prop on `entering` or `exiting` states
-- **reverse** `boolean` - `in` prop set to *true* on `exiting` states and *false* on `entering` states
-#### Notes & Examples
+- **in** `boolean` - extra conditional used to determine `in` prop **Chain** component
+#### Notes
 Functions as a middleman of sorts by retrieving the `state` of the closest parent **Chain** or **InnerChain** component through context and passing it down to its children.
 ```
 <Chain id="app" in={ true }>
@@ -81,7 +81,7 @@ Functions as a middleman of sorts by retrieving the `state` of the closest paren
 - **id** `string|number` *required* - ChainContext unique identifier
 - **state** `string` - component's current state
 - **processTimeout** `function` - callback used to calculate parent Chain/InnerChain timeout
-#### Notes & Examples
+#### Notes
 A HOC that wraps and executes a series of **[Anime.js](http://animejs.com)** calls on its children. Anime.js manipulates DOM and doesn't interact with the VirtualDOM React uses, meaning for it to properly target elements the `ref` prop must be set somewhere on the wrapped component, like example below.
 ```
 const Container = withAnimeJs( 
@@ -115,7 +115,16 @@ The resulting component can be animated by state. This is done by providing anim
 When no `state` prop is provided, it's set to that of the nearest parent `ChainContext`. If none is found, it uses the default which is `unmounted`. Using in conjournment with the **Chain** and **InnerChain** components can allow for centralized state-management and complex transitions without much effort. 
 In the sandbox below is a recreation of couple of [Tobias Ahlin](http://tobiasahlin.com)'s [Moving Letters](http://tobiasahlin.com/moving-letters/#) examples. [Styled Components](https://www.styled-components.com/) are used for the base styling, but this can easily be replace with plain css.
 
+## Examples
+
+Flashy Text
 [![Edit ChainDrive Example-1](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/00rv90712v)
+
+Order Test
+[![Edit Order Test](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/k14roo7q9r)
+
+Overlay Menu
+[![Edit Overlay Menu](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/l25z6k2vlz)
 
 ## Coming Soon
 - More Examples
