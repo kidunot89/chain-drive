@@ -11,7 +11,7 @@
 ### Changes
 - **ChainContext functions moved** to `Chain` component.   
 - **AnimeJs, Chain and InnerChain** components extend `PureComponent` and `memo`.
-- **react and react-dom** removed from dependencies and moved to devDependencies and peerDependencies.
+- **animejs, react, react-transition-group, and react-dom** removed from dependencies and moved to devDependencies and peerDependencies.
 
 ## [0.0.4]
 ### Removed
