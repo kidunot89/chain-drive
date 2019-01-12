@@ -132,7 +132,8 @@ A simple overlay menu created using from both the previous Examples.
 [![Edit Overlay Menu](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/l25z6k2vlz)
 
 ## Coming Soon
-- More Examples
+- Updating `animejs` dependency to v3.0.0.
+- More examples.
 
 ## Potential Ideas
 - More animated HOCs using other animation libraries
