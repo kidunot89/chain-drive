@@ -1,4 +1,17 @@
 # Changelog
+## [0.0.5]
+### Added
+- **order** prop added to `Chain` component. Accepts `fifo`, `filo`, `lifo`, and `lilo` as valid options and defaults to `fifo`.
+- **in** prop added to `InnerChain` component. Defaults to `true`.
+- **prepublish** script added to package.json.
+
+### Removed
+- **inOnEntering and reverse** props removed from `InnerChain` component.
+
+### Changes
+- **ChainContext functions moved** to `Chain` component.   
+- **AnimeJs, Chain and InnerChain** components extend `PureComponent` and `memo`.
+- **animejs, react, react-transition-group, and react-dom** removed from dependencies and moved to devDependencies and peerDependencies.
 
 ## [0.0.4]
 ### Removed

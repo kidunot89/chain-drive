@@ -122,12 +122,12 @@ const processTimeout = ( rootEl, params ) => {
 /**
  * Returns a component to be animated by Anime.js
  * 
- * @param { React.Component } BaseComponent - wrapped component
+ * @param { React.Component || React.PureComponent } BaseComponent - wrapped component
  * 
- * @returns { React.Component }
+ * @returns { React.PureComponent }
  */
 export default BaseComponent => {
-    class AnimeJs extends React.Component {
+    class AnimeJs extends React.PureComponent {
         constructor() {
             super( ...arguments );
             this.ref = React.createRef();
@@ -156,14 +156,18 @@ export default BaseComponent => {
         }
 
         linkToChain() {
-            const { id, state } = this.props;
-            this.props.context.add( id, this.timeout() );
+            const { id, state, context } = this.props;
+            if ( context.updateAnimation ) {
+                context.updateAnimation( id, this.timeout() );
+            }
             this.animate( state );
         }
 
         unlinkToChain() {
-            const { id } = this.props;
-            this.props.context.remove( id );
+            const { id, context } = this.props;
+            if ( context.removeAnimation ) {
+                context.removeAnimation( id );
+            }
         }
 
         timeout() {

@@ -12,126 +12,353 @@ import 'jest-dom/extend-expect';
 import { chainInitialState, ChainContext } from '../src';
 
 describe( 'ChainContext', () => {
-    const chainContext = chainInitialState;
+    let chainContext;
+    beforeEach( () => chainContext = chainInitialState() );
+    afterEach( cleanup );
+
     const Context = () => (
         <ChainContext.Consumer>
             { context => (
                 <React.Fragment>
                     <p className="id">{ context.id }</p>
                     <p className="state">{ context.state }</p>
-                    <p className="enter-timeout">{ context.timeout().enter }</p>
-                    <p className="exit-timeout">{ context.timeout().exit }</p>
-                    { map( context.children, ( { state, enter, exit }, id ) => (
+                    { map( context.animations, ( { enter, exit }, id ) => (
                         <div id={ id } key={ id }>
-                            <p className="child-enter-timeout">{ enter }</p>
-                            <p className="child-exit-timeout">{ exit }</p>
+                            <p className="animation-enter-timeout">{ enter }</p>
+                            <p className="animation-exit-timeout">{ exit }</p>
+                        </div>
+                    ) ) }
+                    { map( context.innerChains, ( state, id ) => (
+                        <div id={ id } key={ id }>
+                            <p className="inner-chain-state">{ state }</p>
                         </div>
                     ) ) }
                 </React.Fragment>
             ) }
         </ChainContext.Consumer>
     );
-
-    afterEach( cleanup );
     it( 'initializes context', async () => {
-        chainContext.init( "test" );
+        chainContext = chainInitialState( "state-test-1" );
         const { container } = render(
             <ChainContext.Provider value={ chainContext }>
                 <Context />
             </ChainContext.Provider>
         );
 
-        await wait( () => expect( container.querySelector( '.id' ).innerHTML ).toEqual( 'test' ) );
+        await wait( () => expect( container.querySelector( '.id' ).innerHTML ).toEqual( 'state-test-1' ) );
         expect( container.querySelector( '.state' ).innerHTML ).toEqual( 'unmounted' );
     } );
 
     it( 'updates context state', async () => {
-        chainContext.init( "test2" );
+        chainContext = chainInitialState( "state-test-2" );
         chainContext.state = 'entering';
+
         const { container } = render(
             <ChainContext.Provider value={ chainContext }>
                 <Context />
             </ChainContext.Provider>
         );
 
-        await wait( () => expect( container.querySelector( '.id' ).innerHTML ).toEqual( 'test2' ) );
+        await wait( () => expect( container.querySelector( '.id' ).innerHTML ).toEqual( 'state-test-2' ) );
         expect( container.querySelector( '.state' ).innerHTML ).toEqual( 'entering' );
     } );
 
-    it( 'add a child to context', async () => {
-        chainContext.init( "test3" );
+    it( 'add an animation to context', async () => {
+        chainContext = chainInitialState( "animation-test-1" );
         chainContext.state = 'entered';
-        chainContext.add( 'test-child-1', { enter: 100, exit: 150 } );
+        chainContext.animations[ 'animation-1' ] = { enter: 100, exit: 150 };
+
         const { container } = render(
             <ChainContext.Provider value={ chainContext }>
                 <Context />
             </ChainContext.Provider>
         );
 
-        await wait( () => expect( container.querySelector( '.id' ).innerHTML ).toEqual( 'test3' ) );
+        await wait( () => expect( container.querySelector( '.id' ).innerHTML ).toEqual( 'animation-test-1' ) );
         expect( container.querySelector( '.state' ).innerHTML ).toEqual( 'entered' );
-        const testChild1 = await waitForElement( () => container.querySelector( '#test-child-1' ) );
-        expect( testChild1 ).toBeTruthy();
-        expect( testChild1.querySelector( '.child-enter-timeout' ).innerHTML ).toEqual( '100' );
-        expect( testChild1.querySelector( '.child-exit-timeout' ).innerHTML ).toEqual( '150' );
+
+        const animation1 = await waitForElement( () => container.querySelector( '#animation-1' ) );
+        expect( animation1 ).toBeTruthy();
+        expect( animation1.querySelector( '.animation-enter-timeout' ).innerHTML ).toEqual( '100' );
+        expect( animation1.querySelector( '.animation-exit-timeout' ).innerHTML ).toEqual( '150' );
     } );
 
-    it( 'add multiple children to context and confirms context timeout', async () => {
-        chainContext.init( "test4" );
+    it( 'add multiple animations to context', async () => {
+        chainContext = chainInitialState( "animation-test-2" );
         chainContext.state = 'entered';
-        chainContext.add( 'test-child-1', { enter: 100, exit: 150 } );
-        chainContext.add( 'test-child-2', { enter: 300, exit: 45 } );
+        chainContext.animations[ 'animation-1' ] = { enter: 100, exit: 150 };
+        chainContext.animations[ 'animation-2' ] = { enter: 300, exit: 45 };
+
         const { container } = render(
             <ChainContext.Provider value={ chainContext }>
                 <Context />
             </ChainContext.Provider>
         );
 
-        await wait( () => expect( container.querySelector( '.id' ).innerHTML ).toEqual( 'test4' ) );
+        await wait( () => expect( container.querySelector( '.id' ).innerHTML ).toEqual( 'animation-test-2' ) );
         expect( container.querySelector( '.state' ).innerHTML ).toEqual( 'entered' );
-        await wait( () => expect( container.querySelector( '.enter-timeout' ).innerHTML ).toEqual( '300' ) );
-        await wait( () => expect( container.querySelector( '.exit-timeout' ).innerHTML ).toEqual( '150' ) );
-        const testChild1 = await waitForElement( () => container.querySelector( '#test-child-1' ) );
-        expect( testChild1 ).toBeTruthy();
-        expect( testChild1.querySelector( '.child-enter-timeout' ).innerHTML ).toEqual( '100' );
-        expect( testChild1.querySelector( '.child-exit-timeout' ).innerHTML ).toEqual( '150' );
-        const testChild2 = await waitForElement( () => container.querySelector( '#test-child-2' ) );
-        expect( testChild2 ).toBeTruthy();
-        expect( testChild2.querySelector( '.child-enter-timeout' ).innerHTML ).toEqual( '300' );
-        expect( testChild2.querySelector( '.child-exit-timeout' ).innerHTML ).toEqual( '45' );
+
+        const animation1 = await waitForElement( () => container.querySelector( '#animation-1' ) );
+        expect( animation1 ).toBeTruthy();
+        expect( animation1.querySelector( '.animation-enter-timeout' ).innerHTML ).toEqual( '100' );
+        expect( animation1.querySelector( '.animation-exit-timeout' ).innerHTML ).toEqual( '150' );
+
+        const animation2 = await waitForElement( () => container.querySelector( '#animation-2' ) );
+        expect( animation2 ).toBeTruthy();
+        expect( animation2.querySelector( '.animation-enter-timeout' ).innerHTML ).toEqual( '300' );
+        expect( animation2.querySelector( '.animation-exit-timeout' ).innerHTML ).toEqual( '45' );
     } );
 
-    it( 'updates child context', async () => {
-        chainContext.init( "test5" );
+    it( 'updates animation context', async () => {
+        chainContext = chainInitialState( "animation-test-3" );
         chainContext.state = 'entered';
-        chainContext.add( 'test-child-1', { enter: 100, exit: 150 } );
+        chainContext.animations[ 'animation-1' ] = { enter: 100, exit: 150 };
+
         const { container, rerender } = render(
             <ChainContext.Provider value={ chainContext }>
                 <Context />
             </ChainContext.Provider>
         );
 
-        await wait( () => expect( container.querySelector( '.id' ).innerHTML ).toEqual( 'test5' ) );
+        await wait( () => expect( container.querySelector( '.id' ).innerHTML ).toEqual( 'animation-test-3' ) );
         expect( container.querySelector( '.state' ).innerHTML ).toEqual( 'entered' );
-        const testChild1 = await waitForElement( () => container.querySelector( '#test-child-1' ) );
-        expect( testChild1 ).toBeTruthy();
-        expect( testChild1.querySelector( '.child-enter-timeout' ).innerHTML ).toEqual( '100' );
-        expect( testChild1.querySelector( '.child-exit-timeout' ).innerHTML ).toEqual( '150' );
-        
-        chainContext.update( 'test-child-1', { enter: 200 } );
-        rerender(
-            <ChainContext.Provider value={ chainContext }>
-                <Context />
-            </ChainContext.Provider>
-        );
-        await wait( () => expect( testChild1.querySelector( '.child-enter-timeout' ).innerHTML ).toEqual( '200' ) );
 
-        chainContext.update( 'test-child-1', { exit: 400 } );
+        const animation1 = await waitForElement( () => container.querySelector( '#animation-1' ) );
+        expect( animation1 ).toBeTruthy();
+        expect( animation1.querySelector( '.animation-enter-timeout' ).innerHTML ).toEqual( '100' );
+        expect( animation1.querySelector( '.animation-exit-timeout' ).innerHTML ).toEqual( '150' );
+        
+        chainContext.animations[ 'animation-1' ] = { enter: 200 };
+
         rerender(
             <ChainContext.Provider value={ chainContext }>
                 <Context />
             </ChainContext.Provider>
         );
-        await wait( () => expect( testChild1.querySelector( '.child-exit-timeout' ).innerHTML ).toEqual( '400' ) );
+
+        await wait( () => expect( animation1.querySelector( '.animation-enter-timeout' ).innerHTML ).toEqual( '200' ) );
+
+        chainContext.animations[ 'animation-1' ] = { exit: 400 };
+
+        rerender(
+            <ChainContext.Provider value={ chainContext }>
+                <Context />
+            </ChainContext.Provider>
+        );
+        await wait( () => expect( animation1.querySelector( '.animation-exit-timeout' ).innerHTML ).toEqual( '400' ) );
+    } );
+
+    it( 'add innerChains to context', async () => {
+        chainContext = chainInitialState( "inner-chain-test-1" );
+        chainContext.state = 'exited';
+        chainContext.innerChains[ 'chain-1' ] = 'unmounted';
+
+        const { container } = render(
+            <ChainContext.Provider value={ chainContext }>
+                <Context />
+            </ChainContext.Provider>
+        );
+
+        await wait( () => expect( container.querySelector( '.id' ).innerHTML ).toEqual( 'inner-chain-test-1' ) );
+        expect( container.querySelector( '.state' ).innerHTML ).toEqual( 'exited' );
+
+        const chain1 = await waitForElement( () => container.querySelector( '#chain-1' ) );
+        expect( chain1 ).toBeTruthy();
+        expect( chain1.querySelector( '.inner-chain-state' ).innerHTML ).toEqual( 'unmounted' );
+
+    } );
+
+
+    it( 'updates innerChains\' state', async () => {
+        chainContext = chainInitialState( "inner-chain-test-2" );
+        chainContext.state = 'entering';
+        chainContext.innerChains[ 'chain-1' ] = 'unmounted';
+
+        const { container, rerender } = render(
+            <ChainContext.Provider value={ chainContext }>
+                <Context />
+            </ChainContext.Provider>
+        );
+
+        await wait( () => expect( container.querySelector( '.id' ).innerHTML ).toEqual( 'inner-chain-test-2' ) );
+        expect( container.querySelector( '.state' ).innerHTML ).toEqual( 'entering' );
+
+        const chain1 = await waitForElement( () => container.querySelector( '#chain-1' ) );
+        expect( chain1 ).toBeTruthy();
+        expect( chain1.querySelector( '.inner-chain-state' ).innerHTML ).toEqual( 'unmounted' );
+
+        chainContext.innerChains[ 'chain-1' ] = 'entering';
+        rerender(
+            <ChainContext.Provider value={ chainContext }>
+                <Context />
+            </ChainContext.Provider>
+        );
+
+        await wait( () => expect( chain1.querySelector( '.inner-chain-state' ).innerHTML ).toEqual( 'entering' ) );
+
+        chainContext.innerChains[ 'chain-1' ] = 'entered';
+        rerender(
+            <ChainContext.Provider value={ chainContext }>
+                <Context />
+            </ChainContext.Provider>
+        );
+
+        await wait( () => expect( chain1.querySelector( '.inner-chain-state' ).innerHTML ).toEqual( 'entered' ) );
+    } );
+
+    it( 'adds multiple innerChains to context', async () => {
+        chainContext = chainInitialState( "inner-chain-test-3" );
+        chainContext.state = 'entered';
+        chainContext.innerChains = { 
+            'chain-1': 'unmounted',
+            'chain-2': 'unmounted',
+        };
+
+        const { container, rerender } = render(
+            <ChainContext.Provider value={ chainContext }>
+                <Context />
+            </ChainContext.Provider>
+        );
+
+        await wait( () => expect( container.querySelector( '.id' ).innerHTML ).toEqual( 'inner-chain-test-3' ) );
+        expect( container.querySelector( '.state' ).innerHTML ).toEqual( 'entered' );
+
+        const chain1 = await waitForElement( () => container.querySelector( '#chain-1' ) );
+        expect( chain1 ).toBeTruthy();
+        expect( chain1.querySelector( '.inner-chain-state' ).innerHTML ).toEqual( 'unmounted' );
+
+        const chain2 = await waitForElement( () => container.querySelector( '#chain-2' ) );
+        expect( chain2 ).toBeTruthy();
+        expect( chain2.querySelector( '.inner-chain-state' ).innerHTML ).toEqual( 'unmounted' );
+
+        chainContext.innerChains = { ...chainContext.innerChains, ...{ 'chain-1': 'entering' } };
+        rerender(
+            <ChainContext.Provider value={ chainContext }>
+                <Context />
+            </ChainContext.Provider>
+        );
+
+        await wait( () => expect( chain1.querySelector( '.inner-chain-state' ).innerHTML ).toEqual( 'entering' ) );
+
+        chainContext.innerChains = { ...chainContext.innerChains, ...{ 'chain-2': 'exited' } };
+        rerender(
+            <ChainContext.Provider value={ chainContext }>
+                <Context />
+            </ChainContext.Provider>
+        );
+
+        await wait( () => expect( chain2.querySelector( '.inner-chain-state' ).innerHTML ).toEqual( 'exited' ) );
+    } );
+} );
+
+describe( 'ChainContext.UpdatingProvider', () => {
+    afterEach( cleanup );
+    const Context = () => (
+        <ChainContext.Consumer>
+            { context => (
+                <div id={ context.id }>
+                    <p className="state">{ context.state }</p>
+                    { map( context.innerChains, ( state, id ) => (
+                        <div id={ `inner-chain-${ id }` } key={ id }>
+                            <p className="inner-chain-state">{ state }</p>
+                        </div>
+                    ) ) }
+                </div>
+            ) }
+        </ChainContext.Consumer>
+    );
+
+    it( 'updates parent ChainContext\'s innerChains with child ChainContext\'s state', async () => {
+        const parentContext = chainInitialState( 'parent' );
+        parentContext.setState = state => parentContext.state = state;
+        parentContext.setState( 'entered' );
+        parentContext.updateInnerChain = ( id, state ) => parentContext.innerChains[ id ] = state;
+        
+        const childContext = chainInitialState( 'child' );
+        childContext.setState = state => { 
+            childContext.state = state;
+            parentContext.updateInnerChain( childContext.id, state );
+        };
+
+        const { container, rerender } = render(
+            <ChainContext.Provider value={ parentContext }>
+                <Context />
+                <ChainContext.UpdatingProvider
+                    context={ childContext }
+                    state="entering"
+                >
+                    <Context />
+                </ChainContext.UpdatingProvider>
+            </ChainContext.Provider>
+        );
+
+        rerender(
+            <ChainContext.Provider value={ parentContext }>
+                <Context />
+                <ChainContext.UpdatingProvider
+                    context={ childContext }
+                    state="entering"
+                >
+                    <Context />
+                </ChainContext.UpdatingProvider>
+            </ChainContext.Provider>
+        );
+        const parent = await waitForElement( () => container.querySelector( '#parent' ) );
+        expect( parent ).toBeTruthy();
+        expect( parent.querySelector( 'p.state' ).innerHTML ).toEqual( 'entered' );
+
+        const child = await waitForElement( () => container.querySelector( '#child' ) );
+        expect( child ).toBeTruthy();
+        await wait( () => expect( child.querySelector( 'p.state' ).innerHTML ).toEqual( 'entering' ) );
+
+        rerender(
+            <ChainContext.Provider value={ parentContext }>
+                <Context />
+                <ChainContext.UpdatingProvider
+                    context={ childContext }
+                    state="entering"
+                >
+                    <Context />
+                </ChainContext.UpdatingProvider>
+            </ChainContext.Provider>
+        );
+        expect( parent.querySelector( '#inner-chain-child .inner-chain-state' ).innerHTML ).toEqual( 'entering' );
+
+        rerender(
+            <ChainContext.Provider value={ parentContext }>
+                <Context />
+                <ChainContext.UpdatingProvider
+                    context={ childContext }
+                    state="entered"
+                >
+                    <Context />
+                </ChainContext.UpdatingProvider>
+            </ChainContext.Provider>
+        );
+        rerender(
+            <ChainContext.Provider value={ parentContext }>
+                <Context />
+                <ChainContext.UpdatingProvider
+                    context={ childContext }
+                    state="entered"
+                >
+                    <Context />
+                </ChainContext.UpdatingProvider>
+            </ChainContext.Provider>
+        );
+        await wait( () => expect( child.querySelector( 'p.state' ).innerHTML ).toEqual( 'entered' ) );
+
+        rerender(
+            <ChainContext.Provider value={ parentContext }>
+                <Context />
+                <ChainContext.UpdatingProvider
+                    context={ childContext }
+                    state="entered"
+                >
+                    <Context />
+                </ChainContext.UpdatingProvider>
+            </ChainContext.Provider>
+        );
+        expect( parent.querySelector( '#inner-chain-child .inner-chain-state' ).innerHTML ).toEqual( 'entered' );
     } );
 } );

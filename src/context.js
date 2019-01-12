@@ -3,64 +3,74 @@
  * External dependencies
  */
 import React from 'react';
-import { reduce } from 'lodash';
+import PropTypes from 'prop-types';
 
 /**
  * Chain initial state
  */
-const chainInitialState = {
-    init ( id, state = 'unmounted' ) {
-        this.id = id;
-        this.state = state;
-        this.children = {};
-
-        return this;
-    },
-
-    add( childId, { enter, exit } ) {
-        this.children[ childId ] = { enter, exit };
-    },
-
-    remove( childId ) {
-        delete this.children[ childId ];
-    },
-
-    exists( childId ) {
-        return !!this.children[ childId ];
-    },
-
-    update( childId, state = {} ) {
-        const oldState = this.children[ childId ];
-        if ( oldState ) {
-            this.children[ childId ] = { ...oldState, ...state };
-        } else {
-            console.warn( `${ childId } is not a child of ${ this.id }` );
-        }
-    },
-
-    timeout() {
-        return reduce(
-            this.children,
-            ( result, { enter, exit } ) => {
-                if ( enter > result.enter ) {
-                    result.enter = enter;
-                }
-
-                if ( exit > result.exit ) {
-                    result.exit = exit;
-                }
-
-                return result;
-            },
-            { enter: 0, exit: 0 },
-        )
-    },
-};
+const chainInitialState = ( id ) => ( {
+    id,
+    state: 'unmounted',
+    animations: {},
+    innerChains: {},
+} );
 
 /**
  * Reusable React Context for Chain
  */
-const ChainContext = React.createContext( chainInitialState );
+const ChainContext = React.createContext( chainInitialState() );
+
+/**
+ * @class UpdatingProvider
+ * 
+ * @description acts as middleman for ChainContext and Transition from 
+ * the 'react-transition-group'. It's job is to update the 'state' state
+ * variable in the wrapping 'Chain' component and calls the 'updateParent'
+ * prop to provide the updated 'state' to the parent 'Chain' of the wrapping 
+ * 'Chain'
+ */
+class UpdatingProvider extends React.PureComponent{
+    constructor() {
+        super( ...arguments );
+        this.update = this.update.bind( this );
+    }
+
+    componentDidMount() {
+        this.update();
+    }
+
+    componentDidUpdate( prevProps ) {
+        if ( prevProps.state !== this.props.state ) {
+            this.update();
+        }
+    }
+
+    update() {
+        const { context, state } = this.props;
+        context.setState( state );
+    }
+
+    render() {
+        return (
+            <ChainContext.Provider value={ { ...this.props.context } }>
+                { this.props.children }
+            </ChainContext.Provider>
+        );
+    }
+}
+
+UpdatingProvider.propTypes = {
+    context: PropTypes.shape( {
+        id: PropTypes.string.isRequired,
+    } ).isRequired,
+    state: PropTypes.string.isRequired,
+};
+
+UpdatingProvider.defaultProps = {
+    parentUpdate: () => {},
+};
+
+ChainContext.UpdatingProvider = UpdatingProvider;
 
 /**
  * Reusable wrapper for passing Chain context and state
@@ -71,11 +81,7 @@ const chainedConsumer = BaseComponent => ( { id, state, ...rest } ) => (
     <ChainContext.Consumer>
         { context => (
             <BaseComponent
-                context={ 
-                    !context.id ?
-                        context.init( id ):
-                        context
-                }
+                context={ !context.id ? chainInitialState( id ): context }
                 id={ id }
                 state={ state || context.state }
                 { ...rest }

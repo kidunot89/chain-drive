@@ -75,102 +75,6 @@
     return target;
   }
 
-  var _jsxFileName = "/home/geoff/Dev/web/chain-drive/src/context.js";
-  /**
-   * Chain initial state
-   */
-
-  var chainInitialState = {
-    init: function init(id) {
-      var state = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'unmounted';
-      this.id = id;
-      this.state = state;
-      this.children = {};
-      return this;
-    },
-    add: function add(childId, _ref) {
-      var enter = _ref.enter,
-          exit = _ref.exit;
-      this.children[childId] = {
-        enter: enter,
-        exit: exit
-      };
-    },
-    remove: function remove(childId) {
-      delete this.children[childId];
-    },
-    exists: function exists(childId) {
-      return !!this.children[childId];
-    },
-    update: function update(childId) {
-      var state = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      var oldState = this.children[childId];
-
-      if (oldState) {
-        this.children[childId] = _objectSpread({}, oldState, state);
-      } else {
-        console.warn("".concat(childId, " is not a child of ").concat(this.id));
-      }
-    },
-    timeout: function timeout() {
-      return lodash.reduce(this.children, function (result, _ref2) {
-        var enter = _ref2.enter,
-            exit = _ref2.exit;
-
-        if (enter > result.enter) {
-          result.enter = enter;
-        }
-
-        if (exit > result.exit) {
-          result.exit = exit;
-        }
-
-        return result;
-      }, {
-        enter: 0,
-        exit: 0
-      });
-    }
-  };
-  /**
-   * Reusable React Context for Chain
-   */
-
-  var ChainContext = React.createContext(chainInitialState);
-  /**
-   * Reusable wrapper for passing Chain context and state
-   * 
-   * @param { React.Component } BaseComponent 
-   */
-
-  var chainedConsumer = function chainedConsumer(BaseComponent) {
-    return function (_ref3) {
-      var id = _ref3.id,
-          state = _ref3.state,
-          rest = _objectWithoutProperties(_ref3, ["id", "state"]);
-
-      return React.createElement(ChainContext.Consumer, {
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 71
-        },
-        __self: this
-      }, function (context) {
-        return React.createElement(BaseComponent, Object.assign({
-          context: !context.id ? context.init(id) : context,
-          id: id,
-          state: state || context.state
-        }, rest, {
-          __source: {
-            fileName: _jsxFileName,
-            lineNumber: 73
-          },
-          __self: this
-        }));
-      });
-    };
-  };
-
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
@@ -1012,12 +916,137 @@
   }
   });
 
+  var _jsxFileName = "/home/geoff/Dev/web/chain-drive/src/context.js";
+  /**
+   * Chain initial state
+   */
+
+  var chainInitialState = function chainInitialState(id) {
+    return {
+      id: id,
+      state: 'unmounted',
+      animations: {},
+      innerChains: {}
+    };
+  };
+  /**
+   * Reusable React Context for Chain
+   */
+
+
+  var ChainContext = React.createContext(chainInitialState());
+  /**
+   * @class UpdatingProvider
+   * 
+   * @description acts as middleman for ChainContext and Transition from 
+   * the 'react-transition-group'. It's job is to update the 'state' state
+   * variable in the wrapping 'Chain' component and calls the 'updateParent'
+   * prop to provide the updated 'state' to the parent 'Chain' of the wrapping 
+   * 'Chain'
+   */
+
+  var UpdatingProvider =
+  /*#__PURE__*/
+  function (_React$PureComponent) {
+    _inherits(UpdatingProvider, _React$PureComponent);
+
+    function UpdatingProvider() {
+      var _this;
+
+      _classCallCheck(this, UpdatingProvider);
+
+      _this = _possibleConstructorReturn(this, _getPrototypeOf(UpdatingProvider).apply(this, arguments));
+      _this.update = _this.update.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+      return _this;
+    }
+
+    _createClass(UpdatingProvider, [{
+      key: "componentDidMount",
+      value: function componentDidMount() {
+        this.update();
+      }
+    }, {
+      key: "componentDidUpdate",
+      value: function componentDidUpdate(prevProps) {
+        if (prevProps.state !== this.props.state) {
+          this.update();
+        }
+      }
+    }, {
+      key: "update",
+      value: function update() {
+        var _this$props = this.props,
+            context = _this$props.context,
+            state = _this$props.state;
+        context.setState(state);
+      }
+    }, {
+      key: "render",
+      value: function render() {
+        return React.createElement(ChainContext.Provider, {
+          value: _objectSpread({}, this.props.context),
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 55
+          },
+          __self: this
+        }, this.props.children);
+      }
+    }]);
+
+    return UpdatingProvider;
+  }(React.PureComponent);
+
+  UpdatingProvider.propTypes = {
+    context: propTypes.shape({
+      id: propTypes.string.isRequired
+    }).isRequired,
+    state: propTypes.string.isRequired
+  };
+  UpdatingProvider.defaultProps = {
+    parentUpdate: function parentUpdate() {}
+  };
+  ChainContext.UpdatingProvider = UpdatingProvider;
+  /**
+   * Reusable wrapper for passing Chain context and state
+   * 
+   * @param { React.Component } BaseComponent 
+   */
+
+  var chainedConsumer = function chainedConsumer(BaseComponent) {
+    return function (_ref) {
+      var id = _ref.id,
+          state = _ref.state,
+          rest = _objectWithoutProperties(_ref, ["id", "state"]);
+
+      return React.createElement(ChainContext.Consumer, {
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 81
+        },
+        __self: this
+      }, function (context) {
+        return React.createElement(BaseComponent, Object.assign({
+          context: !context.id ? chainInitialState(id) : context,
+          id: id,
+          state: state || context.state
+        }, rest, {
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 83
+          },
+          __self: this
+        }));
+      });
+    };
+  };
+
   var _jsxFileName$1 = "/home/geoff/Dev/web/chain-drive/src/chain.jsx";
 
   var Chain =
   /*#__PURE__*/
-  function (_React$Component) {
-    _inherits(Chain, _React$Component);
+  function (_React$PureComponent) {
+    _inherits(Chain, _React$PureComponent);
 
     function Chain() {
       var _this;
@@ -1025,99 +1054,243 @@
       _classCallCheck(this, Chain);
 
       _this = _possibleConstructorReturn(this, _getPrototypeOf(Chain).apply(this, arguments));
-      _this.state = chainInitialState;
+      _this.state = {
+        setState: _this.setTransitionState.bind(_assertThisInitialized(_assertThisInitialized(_this))),
+        updateAnimation: _this.updateAnimation.bind(_assertThisInitialized(_assertThisInitialized(_this))),
+        removeAnimation: _this.removeAnimation.bind(_assertThisInitialized(_assertThisInitialized(_this))),
+        updateInnerChain: _this.updateInnerChain.bind(_assertThisInitialized(_assertThisInitialized(_this))),
+        removeInnerChain: _this.removeInnerChain.bind(_assertThisInitialized(_assertThisInitialized(_this)))
+      };
+      _this.timeout = _this.timeout.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+      _this.isReady = _this.isReady.bind(_assertThisInitialized(_assertThisInitialized(_this)));
       return _this;
     }
 
     _createClass(Chain, [{
-      key: "render",
-      value: function render() {
+      key: "setTransitionState",
+      value: function setTransitionState(state) {
         var _this2 = this;
 
-        var _this$props = this.props,
-            id = _this$props.id,
-            children = _this$props.children,
-            rest = _objectWithoutProperties(_this$props, ["id", "children"]);
+        this.setState({
+          state: state
+        }, function () {
+          return _this2.props.updateParent(_this2.props.id, state);
+        });
+      }
+    }, {
+      key: "updateAnimation",
+      value: function updateAnimation(id, timeout) {
+        var oldAnimation = Object.assign({}, this.state.animations[id]);
+        var updatedAnimation = Object.assign(oldAnimation, timeout);
+        this.setState({
+          animations: _objectSpread({}, this.state.animations, _defineProperty({}, id, updatedAnimation))
+        });
+      }
+    }, {
+      key: "removeAnimation",
+      value: function removeAnimation(id) {
+        var animations = Object.assign({}, this.state.animations);
+        delete animations[id];
+        this.setState({
+          animations: animations
+        });
+      }
+    }, {
+      key: "updateInnerChain",
+      value: function updateInnerChain(id, state) {
+        this.setState({
+          innerChains: _objectSpread({}, this.state.innerChains, _defineProperty({}, id, state))
+        });
+      }
+    }, {
+      key: "removeInnerChain",
+      value: function removeInnerChain(id) {
+        var innerChains = Object.assign({}, this.state.innerChains);
+        delete innerChains[id];
+        this.setState({
+          innerChains: innerChains
+        });
+      }
+    }, {
+      key: "timeout",
+      value: function timeout() {
+        return lodash.reduce(this.state.animations, function (result, _ref) {
+          var enter = _ref.enter,
+              exit = _ref.exit;
 
+          if (enter > result.enter) {
+            result.enter = enter;
+          }
+
+          if (exit > result.exit) {
+            result.exit = exit;
+          }
+
+          return result;
+        }, {
+          enter: 0,
+          exit: 0
+        });
+      }
+    }, {
+      key: "isReady",
+      value: function isReady() {
+        if (this.state.state === 'unmounted') {
+          return;
+        }
+
+        var _this$props = this.props,
+            parentOrder = _this$props.parentOrder,
+            parentState = _this$props.parentState;
+        var ready;
+        var parentReady;
+
+        if (this.state.in) {
+          switch (parentOrder.substring(0, 2)) {
+            case 'li':
+              parentReady = this.state.in;
+              break;
+
+            default:
+              parentReady = !parentState || parentState === 'entered';
+          }
+
+          switch (this.state.order.substring(0, 2)) {
+            case 'li':
+              ready = lodash.every(this.state.innerChains, function (state) {
+                return state === 'entered';
+              });
+              break;
+
+            default:
+              ready = this.state.in;
+          }
+
+          return ready && parentReady;
+        } else {
+          switch (parentOrder.substring(2)) {
+            case 'lo':
+              parentReady = true;
+              break;
+
+            default:
+              parentReady = !parentState || parentState === 'exited';
+          }
+
+          switch (this.state.order.substring(2)) {
+            case 'lo':
+              ready = lodash.every(this.state.innerChains, function (state) {
+                return state === 'exited';
+              }) ? this.state.in : true;
+              return ready;
+
+            default:
+              ready = parentReady ? this.state.in : true;
+              return ready;
+          }
+        }
+      }
+    }, {
+      key: "render",
+      value: function render() {
+        var _this3 = this;
+
+        var transProps = lodash.omit(this.props, ['id', 'children', 'updateParent', 'parentState', 'parentOrder', 'order', 'in']);
         return React.createElement(reactTransitionGroup.Transition, Object.assign({
-          timeout: this.state.timeout()
-        }, rest, {
+          timeout: this.timeout()
+        }, transProps, {
+          in: this.isReady(),
           __source: {
             fileName: _jsxFileName$1,
-            lineNumber: 31
+            lineNumber: 165
           },
           __self: this
         }), function (state) {
-          return React.createElement(ChainContext.Provider, {
-            value: _objectSpread({}, _this2.state, {
-              state: state
-            }),
+          return React.createElement(ChainContext.UpdatingProvider, {
+            context: _this3.state,
+            state: state,
             __source: {
               fileName: _jsxFileName$1,
-              lineNumber: 36
+              lineNumber: 171
             },
             __self: this
-          }, children);
+          }, _this3.props.children);
         });
       }
     }], [{
       key: "getDerivedStateFromProps",
       value: function getDerivedStateFromProps(props, state) {
+        var newState = null;
+
         if (props.id !== state.id) {
-          return state.init(props.id);
+          newState = chainInitialState(props.id);
         }
 
-        return null;
+        if (props.parentState !== state.parentState) {
+          newState = newState || {};
+          newState.parentState = props.parentState;
+        }
+
+        if (props.order !== state.order) {
+          newState = newState || {};
+          newState.order = props.order;
+        }
+
+        if (props.in !== state.in) {
+          newState = newState || {};
+          newState.in = props.in;
+        }
+
+        return newState;
       }
     }]);
 
     return Chain;
-  }(React.Component);
+  }(React.PureComponent);
 
   Chain.propTypes = {
-    id: propTypes.oneOfType([propTypes.string, propTypes.number]).isRequired
+    id: propTypes.oneOfType([propTypes.string, propTypes.number]).isRequired,
+    parentState: propTypes.string,
+    updateParent: propTypes.func,
+    order: propTypes.oneOf(['fifo', 'filo', 'lifo', 'lilo']),
+    parentOrder: propTypes.oneOf(['fifo', 'filo', 'lifo', 'lilo'])
   };
-
-  var InnerChain = function InnerChain(_ref) {
-    var inOnEntering = _ref.inOnEntering,
-        reverse = _ref.reverse,
-        r = _objectWithoutProperties(_ref, ["inOnEntering", "reverse"]);
+  Chain.defaultProps = {
+    updateParent: function updateParent() {},
+    parentState: undefined,
+    order: 'fifo',
+    parentOrder: 'fifo'
+  };
+  var InnerChain = React.memo(function (_ref2) {
+    var show = _ref2.in,
+        rest = _objectWithoutProperties(_ref2, ["in"]);
 
     return React.createElement(ChainContext.Consumer, {
       __source: {
         fileName: _jsxFileName$1,
-        lineNumber: 53
+        lineNumber: 212
       },
       __self: this
-    }, function (_ref2) {
-      var state = _ref2.state;
-      var show;
-
-      if (inOnEntering) {
-        show = reverse ? state === 'exiting' || state === 'exited' : state === 'entering' || state === 'entered';
-      } else {
-        show = reverse ? state === 'exited' : state === 'entered';
-      }
-
-      return React.createElement(Chain, Object.assign({}, r, {
-        in: show,
+    }, function (context) {
+      return React.createElement(Chain, Object.assign({}, rest, {
+        parentState: context.state,
+        parentOrder: context.order,
+        updateParent: context.updateInnerChain,
+        in: show && context.in,
         __source: {
           fileName: _jsxFileName$1,
-          lineNumber: 65
+          lineNumber: 214
         },
         __self: this
       }));
     });
-  };
-
+  });
   InnerChain.propTypes = {
     id: propTypes.oneOfType([propTypes.string, propTypes.number]).isRequired,
-    inOnEntering: propTypes.bool,
-    reverse: propTypes.bool
+    in: propTypes.bool
   };
   InnerChain.defaultProps = {
-    inOnEntering: false,
-    reverse: false
+    in: true
   };
 
   var _jsxFileName$2 = "/home/geoff/Dev/web/chain-drive/src/with-anime.jsx";
@@ -1240,17 +1413,17 @@
   /**
    * Returns a component to be animated by Anime.js
    * 
-   * @param { React.Component } BaseComponent - wrapped component
+   * @param { React.Component || React.PureComponent } BaseComponent - wrapped component
    * 
-   * @returns { React.Component }
+   * @returns { React.PureComponent }
    */
 
 
   var withAnime = (function (BaseComponent) {
     var AnimeJs =
     /*#__PURE__*/
-    function (_React$Component) {
-      _inherits(AnimeJs, _React$Component);
+    function (_React$PureComponent) {
+      _inherits(AnimeJs, _React$PureComponent);
 
       function AnimeJs() {
         var _this;
@@ -1292,23 +1465,33 @@
         value: function linkToChain() {
           var _this$props = this.props,
               id = _this$props.id,
-              state = _this$props.state;
-          this.props.context.add(id, this.timeout());
+              state = _this$props.state,
+              context = _this$props.context;
+
+          if (context.updateAnimation) {
+            context.updateAnimation(id, this.timeout());
+          }
+
           this.animate(state);
         }
       }, {
         key: "unlinkToChain",
         value: function unlinkToChain() {
-          var id = this.props.id;
-          this.props.context.remove(id);
+          var _this$props2 = this.props,
+              id = _this$props2.id,
+              context = _this$props2.context;
+
+          if (context.removeAnimation) {
+            context.removeAnimation(id);
+          }
         }
       }, {
         key: "timeout",
         value: function timeout() {
-          var _this$props2 = this.props,
-              entering = _this$props2.entering,
-              exiting = _this$props2.exiting,
-              processTimeout = _this$props2.processTimeout;
+          var _this$props3 = this.props,
+              entering = _this$props3.entering,
+              exiting = _this$props3.exiting,
+              processTimeout = _this$props3.processTimeout;
           var rootEl = this.ref.current;
           return {
             enter: processTimeout(rootEl, entering),
@@ -1353,7 +1536,7 @@
           }, props, {
             __source: {
               fileName: _jsxFileName$2,
-              lineNumber: 208
+              lineNumber: 212
             },
             __self: this
           }));
@@ -1361,7 +1544,7 @@
       }]);
 
       return AnimeJs;
-    }(React.Component);
+    }(React.PureComponent);
 
     AnimeJs.propTypes = {
       id: propTypes.oneOfType([propTypes.string, propTypes.number]).isRequired,
