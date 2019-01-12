@@ -1,6 +1,6 @@
 # ChainDrive
 [![Build Status](https://travis-ci.org/kidunot89/chain-drive.svg?branch=develop)](https://travis-ci.org/kidunot89/chain-drive)
-[![Coverage Status](https://coveralls.io/repos/github/kidunot89/chain-drive/badge.png?branch=develop)](https://coveralls.io/github/kidunot89/chain-drive?branch=develop)
+[![Coverage Status](https://coveralls.io/repos/github/kidunot89/chain-drive/badge.svg?branch=develop)](https://coveralls.io/github/kidunot89/chain-drive?branch=develop)
 
 ChainDrive is a **[React.js](https://reactjs.org)** component library dedicated to creating complex transitions without adding noise in your code. **[React Transition Group](https://github.com/reactjs/react-transition-group)**'s [`Transition`](https://reactcommunity.org/react-transition-group/transition) component is the core workhorse of this library, so it's a basic understanding of it is necessary there use.
 ###### *Inspired by* **[Anime.js + React Transition Group](https://itnext.io/anime-js-react-transition-group-5f6d0055a3a0)** by *[Uday Hiwarale](https://github.com/thatisuday)*
